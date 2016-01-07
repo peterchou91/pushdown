@@ -1,0 +1,27 @@
+p2a2(x)
+---------INTRODUCTION
+p2(a2,x)
+p1a1(x)
+---------INTRODUCTION
+p1(a1,x)
+pa4(x)
+--------INTRODUCTION
+p(a4,x)
+pa4a5(x)
+----------INTRODUCTION
+pa4(a5,x)
+p(a4,x)
+--------ELIMINATION
+pa4(x)
+p2(a2,x)
+---------ELIMINATION
+p2a2(x)
+p1(a1,x)
+---------ELIMINATION
+p1a1(x)
+pa4(a5,x)
+----------ELIMINATION
+pa4a5(x)
+p2a2(x) p1a1(x)
+------------------NEUTRAL
+pa4a5(x)

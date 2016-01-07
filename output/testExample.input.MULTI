@@ -1,0 +1,33 @@
+Q(x) T(x)
+------------INTRODUCTION
+Q(a,x)
+T(x)
+------INTRODUCTION
+S(b,x)
+T(x)
+------INTRODUCTION
+Q(b,x)
+T(x)
+------INTRODUCTION
+R(a,x)
+Q(x) T(x)
+------------INTRODUCTION
+S(a,x)
+T(x)
+------INTRODUCTION
+P(b,x)
+
+-------INTRODUCTION
+R(b,x)
+
+-------INTRODUCTION
+T(a,x)
+Q(x)
+------INTRODUCTION
+P(a,x)
+
+-------INTRODUCTION
+T(b,x)
+
+------INTRODUCTION
+T(#)

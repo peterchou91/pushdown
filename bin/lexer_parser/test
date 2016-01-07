@@ -1,0 +1,11 @@
+foreach(i in 1..(m-2))
+		{
+			phis[i] := 3;
+		};
+		
+		foreach(i in 0..(m-1))
+		{
+			eat[i] := false;
+		};
+		phis[0] := 5;
+		phis[m-1] := 0;

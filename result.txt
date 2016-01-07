@@ -1,0 +1,46 @@
+proving EU(x,y,safe(x),complete(y),s0)
+0->6
+0: EU(x,y,safe(x),complete(y),s0)
+6: EU(x,y,safe(x),complete(y),s10)
+0->1
+0: EU(x,y,safe(x),complete(y),s0)
+1: safe(s0)
+6->10
+6: EU(x,y,safe(x),complete(y),s10)
+10: EU(x,y,safe(x),complete(y),s2)
+6->7
+6: EU(x,y,safe(x),complete(y),s10)
+7: safe(s10)
+10->11
+10: EU(x,y,safe(x),complete(y),s2)
+11: safe(s2)
+10->15
+10: EU(x,y,safe(x),complete(y),s2)
+15: EU(x,y,safe(x),complete(y),s11)
+15->19
+15: EU(x,y,safe(x),complete(y),s11)
+19: EU(x,y,safe(x),complete(y),s1)
+15->16
+15: EU(x,y,safe(x),complete(y),s11)
+16: safe(s11)
+19->23
+19: EU(x,y,safe(x),complete(y),s1)
+23: EU(x,y,safe(x),complete(y),s13)
+19->20
+19: EU(x,y,safe(x),complete(y),s1)
+20: safe(s1)
+23->24
+23: EU(x,y,safe(x),complete(y),s13)
+24: safe(s13)
+23->27
+23: EU(x,y,safe(x),complete(y),s13)
+27: EU(x,y,safe(x),complete(y),s5)
+27->31
+27: EU(x,y,safe(x),complete(y),s5)
+31: EU(x,y,safe(x),complete(y),s15)
+27->28
+27: EU(x,y,safe(x),complete(y),s5)
+28: safe(s5)
+31->33
+31: EU(x,y,safe(x),complete(y),s15)
+33: complete(s15)

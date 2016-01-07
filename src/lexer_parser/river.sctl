@@ -1,0 +1,24 @@
+states: 
+	s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15;
+atoms: 
+	safe(s0); safe(s1); safe(s2); safe(s4); safe(s5); safe(s10); safe(s11); safe(s13); safe(s14); safe(s15);
+	complete(s15); 
+transitions:
+	s0 -> {s8, s12, s10, s9};
+	s1 -> {s9, s13, s11};
+	s2 -> {s10, s14, s11};
+	s3 -> {s11, s15};
+	s4 -> {s12, s14, s13};
+	s5 -> {s13, s15};
+	s6 -> {s14, s15};
+	s7 -> {s15};
+	s8 -> {s0};
+	s9 -> {s1, s0};
+	s10 -> {s2, s0};
+	s11 -> {s3, s1, s2};
+	s12 -> {s4, s0};
+	s13 -> {s5, s1, s4};
+	s14 -> {s6, s2, s4};
+	s15 -> {s15};
+specs:
+	EU(x, y, safe(x), complete(y), s0);

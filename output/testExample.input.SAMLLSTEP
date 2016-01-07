@@ -1,0 +1,21 @@
+
+-------INTRODUCTION
+R(b,x)
+Q(x)
+------INTRODUCTION
+P(a,x)
+T(x)
+------INTRODUCTION
+R(a,x)
+T(x)
+------INTRODUCTION
+P(b,x)
+P(a,x)
+-------ELIMINATION
+S(x)
+
+------NEUTRAL
+T(x)
+P(x) R(x)
+------------NEUTRAL
+Q(x)
