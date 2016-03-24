@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import sctl.paint.graph.TreeNode;
-
 public class ProveNode{
 	
 	private boolean root = false;

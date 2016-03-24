@@ -17,9 +17,14 @@ import sctl.paint.graph.RGBColor;
 import sctl.paint.graph.TreeEdge;
 import sctl.paint.graph.TreeNode;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES2;
+import com.jogamp.opengl.GL2GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.fixedfunc.GLLightingFunc;
+import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -168,7 +173,7 @@ public class TreeVisualizeListener
 //		gld.setAutoSwapBufferMode(true);
 		GL2 gl = (gld).getGL().getGL2();
 		gl.glLoadIdentity();
-		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 		gl.glPushAttrib(GL2.GL_CURRENT_BIT);
@@ -191,7 +196,7 @@ public class TreeVisualizeListener
 						}
 					}else{
 						if(tn.hitted){
-							gl.glColor3f((float)1.0,(float)0,(float)0);
+							gl.glColor3f((float)1.0,0,0);
 						}else{
 							gl.glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 						}
@@ -241,7 +246,7 @@ public class TreeVisualizeListener
 						if (ton.isVisible()) {
 							gl.glPushMatrix();
 							gl.glLineWidth(e.getSize());
-							gl.glBegin(GL2.GL_LINES);
+							gl.glBegin(GL.GL_LINES);
 							gl.glVertex3d(tn.getX(), tn.getY(), tn.getZ());
 							gl.glVertex3d(ton.getX(), ton.getY(), ton.getZ());
 							gl.glEnd();
@@ -278,13 +283,13 @@ public class TreeVisualizeListener
 		IntBuffer viewport = IntBuffer.allocate(4);
 		FloatBuffer bz = FloatBuffer.allocate(1);
 		FloatBuffer objxyz = FloatBuffer.allocate(3);
-		gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, modelview);
-		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, projection);
-		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
+		gl.glGetFloatv(GLMatrixFunc.GL_MODELVIEW_MATRIX, modelview);
+		gl.glGetFloatv(GLMatrixFunc.GL_PROJECTION_MATRIX, projection);
+		gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
 		// float x = visibleEvent.getX();
 		int x = (int) p.getX();
 		int y = (int) (viewport.get(3) - p.getY());
-		gl.glReadPixels(x, y, 1, 1, GL2.GL_DEPTH_COMPONENT, GL2.GL_FLOAT, bz);
+		gl.glReadPixels(x, y, 1, 1, GL2ES2.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bz);
 		float z = bz.get(0);
 		glu.gluUnProject(x, y, z, modelview, projection, viewport, objxyz);
 		// System.out.println("x, y, z:"+objxyz.get(0)+", "+objxyz.get(1)+",
@@ -315,7 +320,7 @@ public class TreeVisualizeListener
 
 	public void setCamera(GLAutoDrawable gld) {
 		GL2 gl = gld.getGL().getGL2();
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 		visual.showPanel.repaint();
@@ -343,8 +348,8 @@ public class TreeVisualizeListener
 		// GLUT glut = new GLUT();
 		gld.setAutoSwapBufferMode(true);
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
-		gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
-		gl.glEnable(GL2.GL_COLOR_MATERIAL);
+		gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_AMBIENT_AND_DIFFUSE);
+		gl.glEnable(GLLightingFunc.GL_COLOR_MATERIAL);
 //		gl.glClearColor(238.0f / 255.0f, 226.0f / 255.0f, 185.0f / 255.0f, 0.0f);
 		gl.glClearColor(1, 1, 1, 0);
 //		gl.glClearColor(227.0f/255, 237.0f/255, 205.0f/255, 0);
@@ -353,16 +358,16 @@ public class TreeVisualizeListener
 //		gl.glShadeModel(GL2.GL_SMOOTH);
 //		gl.glEnable(GL2.GL_LIGHTING);
 //		gl.glEnable(GL2.GL_LIGHT0);
-		gl.glEnable(GL2.GL_LINE_SMOOTH);
-		gl.glEnable(GL2.GL_POLYGON_SMOOTH);
-		gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-		gl.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
-		gl.glEnable(GL2.GL_BLEND);
-		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnable(GL2GL3.GL_POLYGON_SMOOTH);
+		gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+		gl.glHint(GL2GL3.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL.GL_DEPTH_TEST);
 
 		gl.glViewport(0, 0, gld.getSurfaceWidth(), gld.getSurfaceHeight());
-		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
 		int width = gld.getSurfaceWidth();
 		int height = gld.getSurfaceHeight();
 		if(width == 0 || height == 0) {
@@ -370,7 +375,7 @@ public class TreeVisualizeListener
 		} else {
 			glu.gluPerspective(60.0f, width / height, 1.0f, 10000.0f);
 		}
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 		gl.glLoadIdentity();
 
 		gld.swapBuffers();
@@ -381,7 +386,7 @@ public class TreeVisualizeListener
 	public void reshape(GLAutoDrawable gld, int x, int y, int width, int height) {
 		GL2 gl = gld.getGL().getGL2();
 		gl.glViewport(x, y, width, height);
-		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
 		gl.glLoadIdentity();
 		if(width == 0 || height == 0) {
 			glu.gluPerspective(60.0f, 1, 1.0f, 10000.0f);
@@ -389,7 +394,7 @@ public class TreeVisualizeListener
 			glu.gluPerspective(60.0f, width / height, 1.0f, 10000.0f);
 		}
 		
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 

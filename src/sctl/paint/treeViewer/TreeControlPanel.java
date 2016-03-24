@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
+
 import java.awt.FlowLayout;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -19,7 +21,7 @@ public class TreeControlPanel extends JPanel {
 	public TreeControlPanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();

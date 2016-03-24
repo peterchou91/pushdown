@@ -3,9 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import pushdown.entity.Configuration;
@@ -14,7 +12,7 @@ import pushdown.entity.Rule;
 
 public class Parse {
     //ÊäÈëÎÄ¼ş
-	private static String filename = "testExample.input";//
+	private static String filename = "list";//river.input1 testExample.input river.input1
 	private static String input = "input/" + filename;
 	
 	

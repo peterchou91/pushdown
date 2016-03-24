@@ -1,6 +1,5 @@
 package pushdown.entity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +43,7 @@ public class Configuration {
 		return result;
 	}
 	
+	@Override
 	public boolean equals(Object object){
 		if(object != null && object instanceof Configuration){
 			Configuration c = (Configuration)object;
@@ -75,7 +75,7 @@ public class Configuration {
 	public void setWord(String[] word) {
 		if(word == null){
 			try {
-				throw new IllegalWordException("数组对象word不能为null");
+				throw new IllegalWordException("erro: word is null��");
 			} catch (IllegalWordException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

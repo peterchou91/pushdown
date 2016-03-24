@@ -1,8 +1,6 @@
 package pushdown.entity;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import pushdown.exceptions.EllegalFormException;
@@ -54,6 +52,7 @@ public class Rule {
 		
 	}
 	
+	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		for ( Configuration c : premise ){

@@ -13,9 +13,14 @@ import sctl.paint.graph.RGBColor;
 import sctl.paint.graph.StateEdge;
 import sctl.paint.graph.StateNode;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES2;
+import com.jogamp.opengl.GL2GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.fixedfunc.GLLightingFunc;
+import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
 
@@ -43,7 +48,7 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 	public void display(GLAutoDrawable gld) {
 		GL2 gl = (gld).getGL().getGL2();
 		gl.glLoadIdentity();
-		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 		gl.glPushAttrib(GL2.GL_CURRENT_BIT);
@@ -62,7 +67,7 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 				StateNode psn = se.getTo();
 				gl.glPushMatrix();
 				gl.glColor3f(1.0f, 1.0f, 1.0f);
-				gl.glBegin(GL2.GL_LINES);
+				gl.glBegin(GL.GL_LINES);
 				gl.glVertex3d(sn.getX(), sn.getY(), sn.getZ());
 				gl.glVertex3d(psn.getX(), psn.getY(), psn.getZ());
 				gl.glEnd();
@@ -84,13 +89,13 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 		IntBuffer viewport = IntBuffer.allocate(4);
 		FloatBuffer bz = FloatBuffer.allocate(1);
 		FloatBuffer objxyz = FloatBuffer.allocate(3);
-		gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, modelview);
-		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, projection);
-		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
+		gl.glGetFloatv(GLMatrixFunc.GL_MODELVIEW_MATRIX, modelview);
+		gl.glGetFloatv(GLMatrixFunc.GL_PROJECTION_MATRIX, projection);
+		gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
 		// float x = visibleEvent.getX();
 		int x = (int) p.getX();
 		int y = (int) (viewport.get(3) - p.getY());
-		gl.glReadPixels(x, y, 1, 1, GL2.GL_DEPTH_COMPONENT, GL2.GL_FLOAT, bz);
+		gl.glReadPixels(x, y, 1, 1, GL2ES2.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bz);
 		float z = bz.get(0);
 		glu.gluUnProject(x, y, z, modelview, projection, viewport, objxyz);
 		// System.out.println("x, y, z:"+objxyz.get(0)+", "+objxyz.get(1)+",
@@ -122,7 +127,7 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 	
 	public void setCamera(GLAutoDrawable gld) {
 		GL2 gl = gld.getGL().getGL2();
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 		visual.showPanel.repaint();
@@ -141,24 +146,24 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 		// GLUT glut = new GLUT();
 		gld.setAutoSwapBufferMode(true);
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
-		gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
-		gl.glEnable(GL2.GL_COLOR_MATERIAL);
+		gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_AMBIENT_AND_DIFFUSE);
+		gl.glEnable(GLLightingFunc.GL_COLOR_MATERIAL);
 //		gl.glClearColor(238.0f / 255.0f, 226.0f / 255.0f, 185.0f / 255.0f, 0.0f);
 		gl.glClearColor(0, 0, 0, 0);
 		gl.glClearDepth(1.0);
 //		gl.glShadeModel(GL2.GL_SMOOTH);
 //		gl.glEnable(GL2.GL_LIGHTING);
 //		gl.glEnable(GL2.GL_LIGHT0);
-		gl.glEnable(GL2.GL_LINE_SMOOTH);
-		gl.glEnable(GL2.GL_POLYGON_SMOOTH);
-		gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-		gl.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
-		gl.glEnable(GL2.GL_BLEND);
-		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnable(GL2GL3.GL_POLYGON_SMOOTH);
+		gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+		gl.glHint(GL2GL3.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL.GL_DEPTH_TEST);
 
 		gl.glViewport(0, 0, gld.getSurfaceWidth(), gld.getSurfaceHeight());
-		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
 		int width = gld.getSurfaceWidth();
 		int height = gld.getSurfaceHeight();
 		if(width == 0 || height == 0) {
@@ -167,7 +172,7 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 			glu.gluPerspective(60.0f, width / height, 1.0f, 10000.0f);
 		}
 //		glu.gluPerspective(60.0f, gld.getSurfaceWidth() / gld.getSurfaceHeight(), 1.0f, 10000.0f);
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		// gl.glLightfv(arg0, arg1, arg2, arg3);
 //		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition, 0);
@@ -182,10 +187,10 @@ public class StateGraphVisualizeListener implements GLEventListener,MouseListene
 		GL2 gl = gld.getGL().getGL2();
 		
 		gl.glViewport(x, y, width, height);
-		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
 		gl.glLoadIdentity();
 		glu.gluPerspective(60.0f, width / height, 1.0f, 10000.0f);
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 	}

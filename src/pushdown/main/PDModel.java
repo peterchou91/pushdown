@@ -76,7 +76,7 @@ public class PDModel {
 	}
 
 	public static void doProve() {
-		Logger.debug("start");
+		Logger.debug("start1");
 		Parse.init();
 		rules = Parse.getRules();
 		configurations = Parse.getConfigurations();
@@ -89,10 +89,11 @@ public class PDModel {
 		
 		//original prove path 
 		Configuration c = new Configuration();
-		c.setState("S");
-		c.setWord(new String[]{"c","e","g","i","g","e","c","g","i","g","c","e","g","i","g","e","c","g","i","g","g","i","i","e","c","i","g","d","f","h","j"});
+//		c.setState("S");
+//		c.setWord(new String[]{"c","e","g","i","g","e","c","g","i","g","c","e","g","i","g","e","c","g","i","g","g","i","i","e","c","i","g","d","f","h","j"});
 //		c.setWord(new String[]{"a","b"});
-		
+		c.setState("p");
+		c.setWord(new String[]{"#"});
 		Configuration c1 = new Configuration();
 		c1.setState("S");
 		c1.setWord(new String[]{"a","a"});
@@ -215,11 +216,12 @@ public class PDModel {
 			}
 		}
 		for(String key : diffSet){
-			Logger.debug("cut " +key);
+//			Logger.debug("cut " +key);
 			oriCon2PnHm.get(key).isCut = true;
 		}
 		
 		//ProveNode pn1 = findProvePath(c1,s1,constateRuleMapForCom);
+		
 		Logger.debug("findProvePath end");
 		System.out.println("print path pn:");
 		Logger.debug(pn == null);
@@ -246,7 +248,7 @@ public class PDModel {
 			++countEdge;
 			parent = elem;
 		}
-		Logger.debug("model countNode:" + countNode + " countEdge:" + countEdge);
+//		Logger.debug("model countNode:" + countNode + " countEdge:" + countEdge);
 		
 	}
 
@@ -275,7 +277,7 @@ public class PDModel {
 			}
 			count++;
 		}
-		Logger.debug("countNode:" + countNode + " countEdge:" + countEdge);
+//		Logger.debug("countNode:" + countNode + " countEdge:" + countEdge);
 	}
 	private static void printProvePath(ProveNode pn) {
 		if(pn == null) return;
@@ -816,6 +818,8 @@ public class PDModel {
 		Con2PnHm.put(retProveNode.ConfigurationString(),retProveNode);
 		String[] targetWord = null;
 		int level = 0;
+		
+		//同步代码
 		if(Constants.pd.equals(way)){
 			proofViewer.addNodeForPD(retProveNode, false,false,level);
 			PDModel.proofViewer.updateLayout(way);
@@ -823,7 +827,17 @@ public class PDModel {
 			oriProofViewer.addNodeForPD(retProveNode, false,false,level);
 			PDModel.oriProofViewer.updateLayout(way);
 		}
+		
+		int con = 0;
 		while(!stack.empty()){
+//			if(con < 4){
+//				try{
+//					Thread.sleep(3000);
+//				}catch(Exception e){
+//					e.printStackTrace();
+//				}
+//				con++;
+//			}
 			proved = false;
 			ProveNode e = stack.pop();
 			Logger.debug("pop:" + e.toString());

@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -84,8 +83,6 @@ public class TreeVisualizer implements TreeGenerationListener {
 			}
 			
 		});
-		
-
 		
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -232,8 +229,6 @@ public class TreeVisualizer implements TreeGenerationListener {
 		
 		if(pn2TnMap == null) pn2TnMap = new HashMap<ProveNode,TreeNode>();
 		pn2TnMap.put(pn, n);
-		
-
 	}
 	
 
@@ -257,6 +252,10 @@ public class TreeVisualizer implements TreeGenerationListener {
 		tree.deleteEdge(pei.getFrom(), pei.getTo());
 	}
 	
+	/*
+	 * (non-Javadoc)∆Ù∂Øupdatelayoutœﬂ≥Ã
+	 * @see sctl.paint.listener.TreeGenerationListener#updateLayout(java.lang.String)
+	 */
 	@Override
 	public void updateLayout(String way) {
 		if(tree != null){

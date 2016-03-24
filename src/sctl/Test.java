@@ -3,8 +3,6 @@ package sctl;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import sctl.formulas.AtomicFml;
-
 public class Test {
 
 	/**

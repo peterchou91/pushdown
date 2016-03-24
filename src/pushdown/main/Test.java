@@ -3,18 +3,11 @@ package pushdown.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Vector;
-
-import pushdown.entity.Configuration;
-import pushdown.entity.ProveNode;
-import pushdown.entity.Rule;
-import pushdown.util.Constants;
 import pushdown.util.Logger;
 
 public class Test {

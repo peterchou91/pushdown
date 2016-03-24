@@ -1,0 +1,15 @@
+s(x)
+------INTRODUCTION
+s(a,x)
+p(a,x)
+-------ELIMINATION
+p(x)
+p(x)
+------INTRODUCTION
+s(a,x)
+s(a,x)
+-------ELIMINATION
+p(x)
+
+------INTRODUCTION
+s(#)
