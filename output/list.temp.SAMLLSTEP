@@ -1,15 +1,9 @@
-s(x)
-------INTRODUCTION
-s(a,x)
 p(x)
 ------INTRODUCTION
 s(a,x)
 
 ------INTRODUCTION
 s(#)
-p(a,x)
--------ELIMINATION
-p(x)
 s(a,x)
 -------ELIMINATION
 p(x)

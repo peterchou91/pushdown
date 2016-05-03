@@ -8,7 +8,7 @@ import pushdown.util.Constants;
 import pushdown.util.Logger;
 
 
-public class Rule {
+public class Rule implements Comparable {
 	private static int count = 0;
 	
 	public Set<Rule> fromRules = new HashSet<Rule>();
@@ -260,6 +260,10 @@ public class Rule {
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public int compareTo(Object o) {
+		return this.toString().compareTo(o.toString());
 	}
 	
 }

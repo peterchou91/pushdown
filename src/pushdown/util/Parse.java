@@ -140,7 +140,7 @@ public class Parse {
 	 * @param line Configuration×Ö·û´®
 	 * @return Configuration
 	 */
-	private static Configuration pareConfiguration(String configurationStr) {
+	public static Configuration pareConfiguration(String configurationStr) {
 		// p'1(a2,a3)
 		Configuration c = null;
 		

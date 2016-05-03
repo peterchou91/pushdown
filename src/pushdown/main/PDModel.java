@@ -2,6 +2,7 @@ package pushdown.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +24,10 @@ import sctl.paint.treeViewer.TreeVisualizer;
 
 
 public class PDModel {
+	
+	//
+	public static String targetConfiguration = "p(#)";
+	
 	public static int maxDepth = 0;
 	private static Set<Rule> rules = new HashSet<Rule>();
 	
@@ -66,7 +71,7 @@ public class PDModel {
 	
 //	private static List<Rule> ama = new ArrayList<Rule>();
 	
-	
+	public static List<Rule> l = null;
 
 	/**
 	 * @param args
@@ -79,6 +84,7 @@ public class PDModel {
 		Logger.debug("start1");
 		Parse.init();
 		rules = Parse.getRules();
+
 		configurations = Parse.getConfigurations();
 		symbols = Parse.getSymbols();
 		Logger.debug("******* symbols:" + symbols.toString());
@@ -88,25 +94,15 @@ public class PDModel {
 		Logger.debug("------------------------------");
 		
 		//original prove path 
-		Configuration c = new Configuration();
-//		c.setState("S");
-//		c.setWord(new String[]{"c","e","g","i","g","e","c","g","i","g","c","e","g","i","g","e","c","g","i","g","g","i","i","e","c","i","g","d","f","h","j"});
-//		c.setWord(new String[]{"a","b"});
-		c.setState("p");
-		c.setWord(new String[]{"#"});
-		Configuration c1 = new Configuration();
-		c1.setState("S");
-		c1.setWord(new String[]{"a","a"});
+		Configuration c = Parse.pareConfiguration(targetConfiguration); //new Configuration();
 		
 		
 		HashMap<String, ProveNode> oriCon2PnHm = new HashMap<String,ProveNode>();
 
-		PDModel.oriProofViewer.show(Constants.ori);
-		
-		
+		PDModel.oriProofViewer.show(Constants.ori);		
 		oriPn = findProvePath(c,rulesToStateRuleMap(rules),oriCon2PnHm,Constants.ori);
-		
-		Logger.debug(configurations.size()+"");
+//		System.exit(0);
+//		Logger.debug(configurations.size()+"");
 		for(Rule rule : rules){
 			rule.toSmallStep();
 			switch(rule.getForm()){
@@ -132,22 +128,10 @@ public class PDModel {
 				break;
 			}
 		}
-		Logger.debug("***********alternating pushdown system rules start*******************");
-		Logger.debug("rules:" + rules.size() + ";introRules:" + introRules.size() + ";elimRules" + elimRules.size() + ";neutralRules" + neutralRules.size());
-		for(Rule rule : rules){
-			Logger.debug(rule.toString(), Constants.APS);
-			Logger.debug(rule);
-			Logger.debug();
-		}
-		Logger.debug("***********alternating pushdown system rules end*******************");
-		
-//		Alternating pushdown system  -->  small step alternating pushdown system
+
 		 
 		APS2STAPS();
-		Logger.debug("");
 		
-		Logger.debug("***********small step alternating pushdown system rules start*******************");
-		Logger.debug("rules:" + rules.size() + ";introRules:" + introRules.size() + ";elimRules" + elimRules.size() + ";neutralRules" + neutralRules.size());
 		Comparator<Rule> comparator = new Comparator<Rule>() {
 			@Override
 		    public int compare(Rule r1, Rule r2) {
@@ -165,19 +149,15 @@ public class PDModel {
 			Logger.debug(rule);
 			Logger.debug();
 		}
-		Logger.debug("***********small step alternating pushdown system rules end********");
 		
 		saturation();
 		complementation();
 		
-		Logger.debug("***********Complementation rules start*******************");
-		Logger.debug("rules:" + rules.size() + ";introRules:" + introRules.size() + ";elimRules" + elimRules.size() + ";neutralRules" + neutralRules.size());
 		for(Rule rule : complementationRules){
 			Logger.debug(rule.toComplementationString(), Constants.COMPLEMENTATION);
 			Logger.debug(rule);
 			Logger.debug();
 		}
-		Logger.debug("***********Complementation rules end********");
 		
 		//initialize model
 	    List<ProveNode> model = new ArrayList<ProveNode>();
@@ -190,22 +170,10 @@ public class PDModel {
 	    	model.add(pn);
 	    	rule2PnModel.put(r, pn);
 	    }
-	    initTreeVisualizer(model, modelViewer);
-	    PDModel.modelViewer.show("");
-		PDModel.modelViewer.updateLayout();
-	    
-		Logger.debug("********constateRuleMap***********");
-		for(String key : constateRuleMap.keySet()){
-			Logger.debug("key:" + key);
-			for(Rule rule : constateRuleMap.get(key)){
-				Logger.debug(rule.toString());
-			}
-		}
-		Logger.debug("********constateRuleMap end***********");
 		
 		HashMap<String, ProveNode> con2PnHm = new HashMap<String,ProveNode>();
-		PDModel.proofViewer.show(Constants.pd);
-		pn = findProvePath(c,constateRuleMap, con2PnHm,Constants.pd);
+//		PDModel.proofViewer.show(Constants.pd);
+//		pn = findProvePath(c,constateRuleMap, con2PnHm,Constants.pd);
 		
 		
 		//find cut nodes
@@ -216,19 +184,18 @@ public class PDModel {
 			}
 		}
 		for(String key : diffSet){
-//			Logger.debug("cut " +key);
 			oriCon2PnHm.get(key).isCut = true;
 		}
 		
 		//ProveNode pn1 = findProvePath(c1,s1,constateRuleMapForCom);
 		
-		Logger.debug("findProvePath end");
-		System.out.println("print path pn:");
-		Logger.debug(pn == null);
-		printProvePath(pn);
-		System.out.println("print path oriPn:");
-		Logger.debug(oriPn == null);
-		printProvePath(oriPn);
+//		Logger.debug("findProvePath end");
+//		System.out.println("print path pn:");
+//		Logger.debug(pn == null);
+//		printProvePath(pn);
+//		System.out.println("print path oriPn:");
+//		Logger.debug(oriPn == null);
+//		printProvePath(oriPn);
 
 		Logger.close();
 	}
@@ -364,7 +331,7 @@ public class PDModel {
 	public static void TransformCf2SmallStepCf(Configuration cf) {
 		if(null != cf){
 			if(cf.getWord().length >= 0){
-				Logger.debug("************ " + cf.toString()+ " ****************");
+//				Logger.debug("************ " + cf.toString()+ " ****************");
 				if(null == addedConfigurations){
 					addedConfigurations = new HashSet<Configuration>();
 				}
@@ -388,21 +355,21 @@ public class PDModel {
 						introRules.add(ruleIntroduciton);
 						addedRules.add(ruleIntroduciton);
 						
-						Logger.debug("added Introduction rule:\n" + ruleIntroduciton.toString());
+//						Logger.debug("added Introduction rule:\n" + ruleIntroduciton.toString());
 						
 						Rule ruleElimination = new Rule(conclusionC,premiseC);
 						ruleElimination.setForm(Constants.ELIMINATION);
 						elimRules.add(ruleElimination);
 						addedRules.add(ruleElimination);
-						Logger.debug("added Elimination rule:\n" + ruleElimination.toString());
+//						Logger.debug("added Elimination rule:\n" + ruleElimination.toString());
 					
 						preState.append(word[i]);
 					}
 					cf.setState(preState.toString());
 					cf.setWord("x");
-					Logger.debug("new Configuration:\n" + cf.toString());
+//					Logger.debug("new Configuration:\n" + cf.toString());
 				}
-				Logger.debug("***********************************************************");
+//				Logger.debug("***********************************************************");
 			}
 		}
 	}
@@ -774,7 +741,7 @@ public class PDModel {
 	}
 	
 	public static String[] matchedWord(String[] targetWord,String[] word){
-		Logger.debug("targetWord:" + Arrays.toString(targetWord) + ";word:" + Arrays.toString(word));
+//		Logger.debug("targetWord:" + Arrays.toString(targetWord) + ";word:" + Arrays.toString(word));
 		String[] ret = null;
 		if(targetWord.length == 1 && word.length == 1 && targetWord[0].equals("#") && word[0].equals("#")){
 			//targetWord:T(#),word:T(#)
@@ -830,17 +797,21 @@ public class PDModel {
 		
 		int con = 0;
 		while(!stack.empty()){
-//			if(con < 4){
+			if(TreeVisualizer.stop){
+				return null;
+			}
+			if(con == 100){
+				return null;
 //				try{
 //					Thread.sleep(3000);
 //				}catch(Exception e){
 //					e.printStackTrace();
 //				}
-//				con++;
-//			}
+			}
+			con++;
 			proved = false;
 			ProveNode e = stack.pop();
-			Logger.debug("pop:" + e.toString());
+//			Logger.debug("pop:" + e.toString());
 
 			Set<Rule> tempSet = ruleMap.get(e.getConfiguration().getState());
 			targetWord = e.getConfiguration().getWord();
@@ -857,8 +828,9 @@ public class PDModel {
 				level++;
 				
 				if(null != ret){
+					//found the rule
 					proved = true;
-					Logger.debug("choosed rule:\n" + rule);
+//					Logger.debug("choosed rule:\n" + rule);
 					if(modelViewer.pn2TnMap != null){
 						for(Entry<ProveNode, TreeNode> entry:modelViewer.pn2TnMap.entrySet()){
 							if(entry.getValue().hitted){
@@ -868,7 +840,7 @@ public class PDModel {
 						}
 						modelViewer.pn2TnMap.get(rule2PnModel.get(rule)).hitted = true;
 					}
-					Logger.debug("ret String[]:" + Arrays.toString(ret));
+//					Logger.debug("ret String[]:" + Arrays.toString(ret));
 					if(rule.getPremise() != null && rule.getPremise().size() != 0){
 						for(Configuration prem : rule.getPremise()){
 							Configuration tempCon = new Configuration();
@@ -900,7 +872,7 @@ public class PDModel {
 						e.getChildren().add(leaf);
 						leaf.parent = e;
 						updateProvedProperty(leaf);
-						System.out.println("add leaf:" + leaf.getId());
+//						System.out.println("add leaf:" + leaf.getId());
 						addProveNode(leaf,way,e,level);
 						updateProvedNodeMap(leaf,way);
 					}
@@ -913,6 +885,7 @@ public class PDModel {
 					}
 				}else{
 					if(count == tempSet.size() && !proved ){
+						//find prove tree failed 
 						return null;
 					}
 				}
@@ -926,6 +899,7 @@ public class PDModel {
 		}
 		return retProveNode;
 	}
+
 
 	/**
 	 * update node's proved property

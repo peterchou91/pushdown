@@ -11,11 +11,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.LinkedList;
-
-import sctl.paint.graph.RGBColor;
-import sctl.paint.graph.TreeEdge;
-import sctl.paint.graph.TreeNode;
+import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -29,12 +27,17 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.gl2.GLUT;
 
+import pushdown.main.PDModel;
+import sctl.paint.graph.RGBColor;
+import sctl.paint.graph.TreeEdge;
+import sctl.paint.graph.TreeNode;
+
 public class TreeVisualizeListener
 		implements GLEventListener, KeyListener, MouseListener, MouseWheelListener, MouseMotionListener {
 	public static final RGBColor red = new RGBColor(1,0,0);
 	public static final RGBColor green = new RGBColor(0,1,0);
 	public static final RGBColor blue = new RGBColor(0,0,1);
-	public static final RGBColor highlight = new RGBColor(198.0f/255,145.0f/255,69.0f/255);
+//	public static final RGBColor highlight = new RGBColor(198.0f/255,145.0f/255,69.0f/255);
 //	public static final RGBColor rootColor = new RGBColor(56.0f/255,94.0f/255,15.0f/255);
 	public static final RGBColor rootColor = new RGBColor(0,0,0);
 	public static final RGBColor oriColor = new RGBColor(0,0,0);
@@ -69,7 +72,10 @@ public class TreeVisualizeListener
 	private TextRenderer tr = new TextRenderer(new Font("SansSerif", Font.PLAIN, 30));
 	// private RGBColor preColor = null;
 	private LinkedList<AssistAffect> affect = new LinkedList<AssistAffect>();
-
+	
+	public List<TreeEdge> subwindowEdges = new ArrayList<TreeEdge>();
+	public List<TreeNode> subwindowNodes = new LinkedList<TreeNode>();
+	
 	public TreeVisualizeListener(TreeVisualizer visual) {
 		this.visual = visual;
 	}
@@ -86,7 +92,7 @@ public class TreeVisualizeListener
 		if (e.isMetaDown()) {
 			showingPop = true;
 			if (nodeSelected == null) {
-				System.out.println("show back pop");
+//				System.out.println("show back pop");
 				visual.backPop.show(e.getComponent(), e.getX(), e.getY());
 			} else {
 				visual.nodePop.show(e.getComponent(), e.getX(), e.getY());
@@ -107,6 +113,7 @@ public class TreeVisualizeListener
 				}
 			}
 		}
+		inSelectedZone();
 	}
 
 	@Override
@@ -127,10 +134,81 @@ public class TreeVisualizeListener
 		this.dragStartY = e.getY();
 	}
 
+	int zoneX1;
+	int zoneY1;
+	int zoneX2;
+	int zoneY2;
+	int dx = 50,dy = 50;
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
+	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
+		int x = e.getX();
+		int y = e.getY();
+		zoneX1 = x - dx;
+		zoneY1 = y + dy;
+		zoneX2 = x + dx;
+		zoneY2 = y - dy;
+		
+		LinkedList<TreeNode> painting = new LinkedList<TreeNode>();
+		painting.addLast(visual.tree.getRoot());
+		while (!painting.isEmpty()) {
+			TreeNode tn = painting.removeFirst();
+			System.out.printf("node:(%s,%s)",tn.getX() + "",tn.getY() + "");
+				//draw nodes and lines
+				if(tn.isShowSubtree()) {
+					for (TreeEdge edge : visual.tree.getEdges(tn)) {
+							painting.addLast(edge.getTo());
+					}
+				}
+		}
+	}
+	public FloatBuffer screenP2WorldP(GL2 gl,Point p){
+		FloatBuffer projection = FloatBuffer.allocate(16);
+		FloatBuffer modelview = FloatBuffer.allocate(16);
+		IntBuffer viewport = IntBuffer.allocate(4);
+		FloatBuffer bz = FloatBuffer.allocate(1);
+		FloatBuffer objxyz = FloatBuffer.allocate(3);
+		gl.glGetFloatv(GLMatrixFunc.GL_MODELVIEW_MATRIX, modelview);
+		gl.glGetFloatv(GLMatrixFunc.GL_PROJECTION_MATRIX, projection);
+		gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
+		// float x = visibleEvent.getX();
+		int x = (int) p.getX();
+		int y = (int) (viewport.get(3) - p.getY());
+		gl.glReadPixels(x, y, 1, 1, GL2ES2.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bz);
+		float z = bz.get(0);
+		glu.gluUnProject(x, y, z, modelview, projection, viewport, objxyz);
+		return objxyz;
+	}
+	
+	public TreeNode subRoot = null;
+	
+	public boolean inSelectedZone(){
+		if(nodeSelected == null) return false;
 
+		System.out.println();
+		int d = 5;
+
+		subwindowNodes.clear();
+		subwindowEdges.clear();
+		TreeNode p = nodeSelected;
+		LinkedList<TreeNode> stack = new LinkedList<TreeNode>();
+		stack.push(p);
+		while(d > 0){
+			d--;
+			TreeNode t = stack.pop();
+			if(d == 5/2) subRoot = t;
+			subwindowNodes.add(t);
+			if(d != 0)
+				for(TreeEdge e : visual.tree.treeStruct.get(t)){
+					subwindowEdges.add(e);
+					stack.push(e.getTo());
+				}
+			else
+				while(!stack.isEmpty()){
+					subwindowNodes.add(stack.pop());
+				}
+		}
+		return false;
 	}
 
 	@Override
@@ -170,20 +248,28 @@ public class TreeVisualizeListener
 
 	@Override
 	public void display(GLAutoDrawable gld) {
-//		gld.setAutoSwapBufferMode(true);
 		GL2 gl = (gld).getGL().getGL2();
 		gl.glLoadIdentity();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
 		glu.gluLookAt(eyex, eyey, eyez, 0, 0, 0, 0, 1, 0);
 		gl.glPushAttrib(GL2.GL_CURRENT_BIT);
-
+		
+		
 		LinkedList<TreeNode> painting = new LinkedList<TreeNode>();
 		painting.addLast(visual.tree.getRoot());
 		int i = 0;
+		
+//		System.out.println(visual.tree.treeStruct.keySet().size());
 		while (!painting.isEmpty()) {
 			TreeNode tn = painting.removeFirst();
+			if(tn == null) continue;
 			if (tn.isVisible()) {
+				if(visual.tree.treeStruct.keySet().size() == 101) {
+					System.out.println("+++" + tn);
+				}
+//				System.out.println(tn.toString() + inSelectedZone(gl,tn));
+				
+				
 				RGBColor color = tn.getColor();
 				gl.glPushMatrix();
 				if (tn.getIsCuted()){
@@ -199,18 +285,34 @@ public class TreeVisualizeListener
 							gl.glColor3f((float)1.0,0,0);
 						}else{
 							gl.glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+							System.out.println(color);
 						}
 					}
 				}
 				if(tn.referd > 0){
 					gl.glColor3f( (float)(250/255.0),(float)(128/255.0),(float)(10/255.0));//orange
 				}
+				
+//				if(tn.getLabel().trim().equals(PDModel.targetConfiguration)){
+//					//black
+//					gl.glColor3f(0,0,0);
+//				}
+//				if(tn.getLabel().trim().equals("#")){
+//					//green
+//					gl.glColor3f((float)0,(float)(255/255.0),(float)0);
+//				}
+//				if(tn.getLabel().trim().equals("s(a)")){
+//					//red
+//					gl.glColor3f((float)1.0,0,0);
+//				}
+				
 				gl.glTranslated(tn.getX(), tn.getY(), tn.getZ());
 				if(tn.hitted){
 					glut.glutSolidSphere(4 * tn.getSize(), 36, 36);
 				}else{
 					glut.glutSolidSphere(tn.getSize(), 36, 36);
 				}
+				
 				i++;
 				if(tn.isLableVisible()) {
 					
@@ -219,16 +321,6 @@ public class TreeVisualizeListener
 					tr.flush();
 					tr.end3DRendering();
 					
-					/*
-					gl.glPushMatrix();
-					tr.beginRendering(1000, 1000);
-					    // optionally set the color
-					tr.setColor(1.0f, 0.2f, 0.2f, 0.8f);
-					tr.draw(tn.getLabel(), 100, 100);
-					    // ... more draw commands, color changes, etc.
-					tr.endRendering();
-					gl.glPopMatrix();
-					*/
 
 				}
 				if(tn.isCutLableVisible()) {
@@ -240,15 +332,44 @@ public class TreeVisualizeListener
 
 				}
 				gl.glPopMatrix();
+				
+				//draw nodes and lines
 				if(tn.isShowSubtree()) {
 					for (TreeEdge e : visual.tree.getEdges(tn)) {
 						TreeNode ton = e.getTo();
 						if (ton.isVisible()) {
+							
+							
+							
 							gl.glPushMatrix();
 							gl.glLineWidth(e.getSize());
+							gl.glColor3f(0,0,0);
 							gl.glBegin(GL.GL_LINES);
 							gl.glVertex3d(tn.getX(), tn.getY(), tn.getZ());
 							gl.glVertex3d(ton.getX(), ton.getY(), ton.getZ());
+							
+							double dx = ton.getX() - tn.getX();
+				            double dy = ton.getY() - tn.getY();
+				            double dz = ton.getZ() - tn.getZ();
+				            double d = Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2)+Math.pow(dz, 2));
+				            double x = tn.getX()+dx*((d-0.1)/d);
+				            double y = tn.getY()+dy*((d-0.1)/d);
+				            double z = tn.getZ()+dz*((d-0.1)/d);
+				            
+				            double x1 = tn.getX()+dx*((d-0.2)/d);
+				            double y1 = tn.getY()+dy*((d-0.2)/d);
+				            double z1 = tn.getZ()+dz*((d-0.2)/d);
+				            
+				            //arrow
+							gl.glVertex3d(x, y, z);
+							gl.glVertex3d(x1 + 0.04, y1, z1);
+							
+							gl.glVertex3d(x, y, z);
+							gl.glVertex3d(x1 - 0.04, y1, z1);
+							
+							gl.glVertex3d(x, y, z);
+							gl.glVertex3d(x1, y1, z1 - 0.04);
+							
 							gl.glEnd();
 							gl.glPopMatrix();
 
@@ -402,9 +523,10 @@ public class TreeVisualizeListener
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+
 		int step = e.getWheelRotation();
 		double current = Math.sqrt(Math.pow(eyex, 2) + Math.pow(eyey, 2) + Math.pow(eyez, 2));
-		System.out.println("current:" + current + ",step:" + step);
+//		System.out.println("current:" + current + ",step:" + step);
 		if(current < 1.5 && step < 0) {
 			return;
 		}
@@ -428,7 +550,7 @@ public class TreeVisualizeListener
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		mousePosition = e.getPoint();
+//		mousePosition = e.getPoint();
 		// System.out.println("Mouse moving: " + mousePosition.getX() + "," +
 		// mousePosition.getY());
 	}

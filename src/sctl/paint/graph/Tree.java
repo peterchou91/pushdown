@@ -35,7 +35,7 @@ public class Tree{
 	
 	public void setHeight() {
 		TreeNode r = this.root;
-		System.out.println(root == null);
+//		System.out.println(root == null);
 		r.setDepth(0);
 		height = 0;
 		LinkedList<TreeNode> heighted = new LinkedList<TreeNode>();
@@ -169,14 +169,14 @@ public class Tree{
 			root = n;
 		}
 		ArrayList<TreeEdge> treeEdges = treeStruct.get(n);
-		System.out.println("to add n:" + n.getId());
+//		System.out.println("to add n:" + n.getId());
 		if(treeEdges == null) {
 			treeStruct.put(n, new ArrayList<TreeEdge>());
 		}else{
 		}
-		System.out.println("tree.addNode tree key size:" +treeStruct.keySet().size());
+//		System.out.println("tree.addNode tree key size:" +treeStruct.keySet().size());
 		for(TreeNode tn : treeStruct.keySet()){
-			System.out.println("node id -- " + tn.getId() + " " + tn.toString());
+//			System.out.println("node id -- " + tn.getId() + " " + tn.toString());
 		}
 		n.setX(random.nextDouble());
 		n.setY(random.nextDouble());
@@ -185,9 +185,9 @@ public class Tree{
 	}
 	
 	public TreeNode getNodeById(String id) {
-		System.out.println(treeStruct.hashCode() + " treeStruct key size:" + treeStruct.keySet().size() + " search:" + id);
+//		System.out.println(treeStruct.hashCode() + " treeStruct key size:" + treeStruct.keySet().size() + " search:" + id);
 		for(TreeNode tn : treeStruct.keySet()) {
-			System.out.println("tree:" + tn.getId());
+//			System.out.println("tree:" + tn.getId());
 			if(tn.getId().equals(id)) {
 				return tn;
 			}
@@ -200,22 +200,22 @@ public class Tree{
 	}
 	
 	public void addEdge(String fromId, String toId) {
-		System.out.println("fromId:" + fromId + " toId:" + toId);
+//		System.out.println("fromId:" + fromId + " toId:" + toId);
 		TreeNode fn = null;
 		TreeNode tn = null;
 
 		fn = getNodeById(fromId);
 		tn = getNodeById(toId);
-		System.out.println(fn == null);
-		System.out.println(fn.getId());
-		System.out.println(tn == null);
-		System.out.println(tn.getId());
+//		System.out.println(fn == null);
+//		System.out.println(fn.getId());
+//		System.out.println(tn == null);
+//		System.out.println(tn.getId());
 //		addEdge(new TreeEdge(fn, tn));
 		tn.setDepth(fn.getDepth()+1);
-		System.out.println("fn:" + fn.getId() + "  tn:" + tn.getId());
+//		System.out.println("fn:" + fn.getId() + "  tn:" + tn.getId());
 		treeStruct.get(fn).add(new TreeEdge(fn, tn));
 		this.setHeight();
-		this.setDepthColor();
+//		this.setDepthColor();
 //		System.out.println("TreeEdge added: "+fn.getId()+"--"+tn.getId());
 	}
 
@@ -355,29 +355,12 @@ public class Tree{
 				double stepZ = force.getZ()*0.01;
 				
 				sn.setXYZ(p.getX()+force.getX()*0.01, p.getY()+force.getY()*0.01, p.getZ()+force.getZ()*0.01);
-//				System.out.println(way + "( " + stepX + "," + stepY + "," + stepY +  " )");
 				sn.setForce(new XYZ(0,0,0));
 
 			}
-			/*
-			if(!"".equals(way)){
-				for(TreeNode sn : treeStruct.keySet()) {
-					XYZ force = sn.getForce();
-					XYZ p = sn.getXYZ();
-					double stepX = force.getX()*0.01;
-					double stepY = force.getY()*0.01;
-					double stepZ = force.getZ()*0.01;
-					
-					sn.setXYZ(p.getX()+force.getX()*0.01, p.getY()+force.getY()*0.01, p.getZ()+force.getZ()*0.01);
-//					System.out.println(way + "( " + stepX + "," + stepY + "," + stepY +  " )");
-					sn.setForce(new XYZ(0,0,0));
-	
-				}
-			}
-			*/
+			
 			root.setXYZ(0, 0, 0);
 			
-//			System.out.println("update once complete");
 		}
 	}
 	
@@ -394,6 +377,22 @@ public class Tree{
 		}
 		
 		root.setOriColor(TreeVisualizeListener.rootColor);
+	}
+	
+	public void setDepthColor(Iterable<TreeNode> it,RGBColor fromColor,RGBColor toColor) {
+		
+		float dr = toColor.getRed() - fromColor.getRed();
+		float dg = toColor.getGreen() - fromColor.getGreen();
+		float db = toColor.getBlue() - fromColor.getBlue();
+		
+		System.out.println("----------------------------");
+		for(TreeNode tn : it) {
+			tn.setOriColor(new RGBColor(fromColor.getRed()+dr*tn.getDepth()/height, fromColor.getGreen()+dg*tn.getDepth()/height, fromColor.getBlue()+db*tn.getDepth()/height));
+//			tn.setOriColor(new RGBColor(163,3,36));
+			tn.clearColor();
+		}
+		System.out.println("----------------------------");
+		
 	}
 
 }

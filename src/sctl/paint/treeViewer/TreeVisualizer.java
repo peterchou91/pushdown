@@ -1,8 +1,10 @@
 package sctl.paint.treeViewer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -22,7 +25,9 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import pushdown.entity.ProveNode;
+import pushdown.main.PDModel;
 import pushdown.util.Constants;
+import sctl.paint.graph.RGBColor;
 import sctl.paint.graph.Tree;
 import sctl.paint.graph.TreeEdge;
 import sctl.paint.graph.TreeNode;
@@ -33,9 +38,11 @@ import sctl.paint.listener.TreeGenerationListener;
 public class TreeVisualizer implements TreeGenerationListener {
 	private JFrame mainFrame;
 	protected GLJPanel showPanel;
+	protected GLJPanel subShowPanel;
 	protected JPopupMenu backPop;
 	protected JPopupMenu nodePop;
-	protected TreeVisualizeListener listener;
+	public TreeVisualizeListener listener;
+	public SubTreeVisualizeListener subListener;
 	public Tree tree;
 	protected TreeNode root;
 	protected TreeControlPanel tcp;
@@ -49,12 +56,15 @@ public class TreeVisualizer implements TreeGenerationListener {
 	
 	public static List<Thread> threads = new ArrayList<Thread>();
 	
+	public static boolean stop = false;
 	
 	
 	public TreeVisualizer(String title) {
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities glcaps = new GLCapabilities(glp);
 		showPanel = new GLJPanel(glcaps);
+		System.out.println("init showPanel");
+		subShowPanel = new GLJPanel(glcaps);
 		iniBackPop();
 		iniNodePop();
 		tree = new Tree();
@@ -63,23 +73,32 @@ public class TreeVisualizer implements TreeGenerationListener {
 		tcp = new TreeControlPanel();
 		tcp.setMinimumSize(new Dimension(300, 600));
 		showPanel.setMinimumSize(new Dimension(600,600));
-		GridLayout gl = new GridLayout();
-		gl.setColumns(2);
-		gl.setRows(1);
+		subShowPanel.setPreferredSize(new Dimension(300,300));
 
-		mainFrame.getContentPane().add(showPanel, BorderLayout.CENTER);
+
+		mainFrame.getContentPane().setLayout(null);
+		mainFrame.getContentPane().add(showPanel);
+		mainFrame.getContentPane().add(subShowPanel);
+		showPanel.setBounds(new Rectangle(0,0,1000,700));
+		subShowPanel.setBounds(new Rectangle(700,700,400,300));
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				listener = new TreeVisualizeListener(TreeVisualizer.this);
+				subListener = new SubTreeVisualizeListener(TreeVisualizer.this);
 				showPanel.addGLEventListener(listener);
 				showPanel.addMouseListener(listener);
 				showPanel.addKeyListener(listener);
 				showPanel.addMouseMotionListener(listener);
 				showPanel.addMouseWheelListener(listener);
-//				mainFrame.getContentPane().add(tcp, BorderLayout.WEST);
+				
+				subShowPanel.addGLEventListener(subListener);
+				subShowPanel.addMouseListener(subListener);
+				subShowPanel.addKeyListener(subListener);
+				subShowPanel.addMouseMotionListener(subListener);
+				subShowPanel.addMouseWheelListener(subListener);
 			}
 			
 		});
@@ -214,7 +233,7 @@ public class TreeVisualizer implements TreeGenerationListener {
 	}
 	
 	public void addNodeForPD(ProveNode pn,boolean isRoot,boolean isCuted,int level) {
-		TreeNode n = new TreeNode(pn.getId() + "", "        " + pn.getLabel());
+		TreeNode n = new TreeNode(pn.getId() + "", "     " + pn.getLabel());
 		n.cutInfo = pn.getFromInfo();
 		n.setIsCuted(isCuted);
 		n.setLevel(level);
@@ -273,6 +292,8 @@ public class TreeVisualizer implements TreeGenerationListener {
 	
 	private class UpdateLayoutThread implements Runnable {
 		private String way;
+		List<TreeNode> redNodes = new ArrayList<TreeNode>();
+		List<TreeNode> blackNodes = new ArrayList<TreeNode>();
 		public UpdateLayoutThread(){
 			
 		}
@@ -282,19 +303,33 @@ public class TreeVisualizer implements TreeGenerationListener {
 
 		@Override
 		public void run() {
+			long currentTime = System.currentTimeMillis();
 			while(true) {
+				redNodes.clear();blackNodes.clear();
 				if(transferProveNode != null){
-					tree.setDepthColor();
+//					tree.setDepthColor();
+					
 					LinkedList<TreeNode> looked = new LinkedList<TreeNode>();
 					looked.addLast(tree.getRoot());
 					while(!looked.isEmpty()) {
 						TreeNode n = looked.removeFirst();
 						n.setPicked(false);
-						n.clearColor();
+						if(n.getLabel().trim().equals("s(a)")){
+							redNodes.add(n);
+						}
+						if(n.getLabel().trim().equals(PDModel.targetConfiguration)){
+							blackNodes.add(n);
+						}
+//						n.clearColor();
 						for(TreeNode tn : tree.getChildrenNodes(n)) {
 							looked.addLast(tn);
 						}
 					}
+					
+					tree.setDepthColor(redNodes, new RGBColor(163,3,36), new RGBColor(253,132,149));
+					tree.setDepthColor(blackNodes, new RGBColor(0,0,0),new RGBColor(182,178,192));
+					System.out.println(redNodes.size());
+					System.out.println(blackNodes.size());
 					
 					copyTreeStruct(tree.treeStruct);
 					transferProveNode = null;
@@ -304,7 +339,10 @@ public class TreeVisualizer implements TreeGenerationListener {
 				}else if(treeStructCopy != null){
 					tree.updateLayout(1,way,treeStructCopy);
 				}
-				
+				if(System.currentTimeMillis() - currentTime > 1000){
+					stop = true;
+					break;
+				}
 			}
 		}
 		private void copyTreeStruct(HashMap<TreeNode, ArrayList<TreeEdge>> treeStruct2) {

@@ -1,5 +1,7 @@
 package sctl.paint.graph;
 
+import pushdown.util.Utils;
+
 public class TreeNode {
 	private RGBColor oriColor = new RGBColor();
 	protected String id;
@@ -79,7 +81,7 @@ public class TreeNode {
 	}
 	
 	public String getLabel() {
-		return label;
+		return Utils.formatLabelString(label);
 	}
 	
 	public String getId() {
