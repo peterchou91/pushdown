@@ -25,11 +25,7 @@ public class RGBColor {
 		this.green = green;
 		this.blue = blue;
 	}
-	public void setColor(int red, int green, int blue) {
-		this.red = (float)(red/255.0);
-		this.green = (float)(green/255.0);
-		this.blue = (float)(blue/255.0);
-	}
+
 	
 	public float getRed() {
 		return red;

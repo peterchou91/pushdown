@@ -44,7 +44,7 @@ public class TreeVisualizeListener
 	public static final RGBColor hoverColor = new RGBColor(186.0f/255,52.0f/255,10.0f/255);
 	public static final RGBColor stepColor = new RGBColor(148.0f/255,0,211.0f/255);
 	public static final RGBColor fromColor = new RGBColor(12.0f/255,22.0f/255,146.0f/255);
-	public static final RGBColor toColor = new RGBColor(0,1,0);
+	public static final RGBColor toColor = new RGBColor(0.0f,1.0f,0.0f);
 	
 	private TreeVisualizer visual;
 
@@ -73,8 +73,8 @@ public class TreeVisualizeListener
 	// private RGBColor preColor = null;
 	private LinkedList<AssistAffect> affect = new LinkedList<AssistAffect>();
 	
-	public List<TreeEdge> subwindowEdges = new ArrayList<TreeEdge>();
-	public List<TreeNode> subwindowNodes = new LinkedList<TreeNode>();
+//	public List<TreeEdge> subwindowEdges = new ArrayList<TreeEdge>();
+//	public List<TreeNode> subwindowNodes = new LinkedList<TreeNode>();
 	
 	public TreeVisualizeListener(TreeVisualizer visual) {
 		this.visual = visual;
@@ -113,7 +113,7 @@ public class TreeVisualizeListener
 				}
 			}
 		}
-		inSelectedZone();
+//		inSelectedZone();
 	}
 
 	@Override
@@ -188,8 +188,8 @@ public class TreeVisualizeListener
 		System.out.println();
 		int d = 5;
 
-		subwindowNodes.clear();
-		subwindowEdges.clear();
+//		subwindowNodes.clear();
+//		subwindowEdges.clear();
 		TreeNode p = nodeSelected;
 		LinkedList<TreeNode> stack = new LinkedList<TreeNode>();
 		stack.push(p);
@@ -197,16 +197,16 @@ public class TreeVisualizeListener
 			d--;
 			TreeNode t = stack.pop();
 			if(d == 5/2) subRoot = t;
-			subwindowNodes.add(t);
+//			subwindowNodes.add(t);
 			if(d != 0)
 				for(TreeEdge e : visual.tree.treeStruct.get(t)){
-					subwindowEdges.add(e);
+//					subwindowEdges.add(e);
 					stack.push(e.getTo());
 				}
-			else
-				while(!stack.isEmpty()){
-					subwindowNodes.add(stack.pop());
-				}
+//			else
+//				while(!stack.isEmpty()){
+////					subwindowNodes.add(stack.pop());
+//				}
 		}
 		return false;
 	}
@@ -261,13 +261,13 @@ public class TreeVisualizeListener
 		
 //		System.out.println(visual.tree.treeStruct.keySet().size());
 		while (!painting.isEmpty()) {
+			
+			
+			
 			TreeNode tn = painting.removeFirst();
 			if(tn == null) continue;
 			if (tn.isVisible()) {
-				if(visual.tree.treeStruct.keySet().size() == 101) {
-					System.out.println("+++" + tn);
-				}
-//				System.out.println(tn.toString() + inSelectedZone(gl,tn));
+				
 				
 				
 				RGBColor color = tn.getColor();
@@ -285,7 +285,7 @@ public class TreeVisualizeListener
 							gl.glColor3f((float)1.0,0,0);
 						}else{
 							gl.glColor3f(color.getRed(), color.getGreen(), color.getBlue());
-							System.out.println(color);
+							System.out.println(tn.hashCode() + " color:" + color);
 						}
 					}
 				}
@@ -293,18 +293,7 @@ public class TreeVisualizeListener
 					gl.glColor3f( (float)(250/255.0),(float)(128/255.0),(float)(10/255.0));//orange
 				}
 				
-//				if(tn.getLabel().trim().equals(PDModel.targetConfiguration)){
-//					//black
-//					gl.glColor3f(0,0,0);
-//				}
-//				if(tn.getLabel().trim().equals("#")){
-//					//green
-//					gl.glColor3f((float)0,(float)(255/255.0),(float)0);
-//				}
-//				if(tn.getLabel().trim().equals("s(a)")){
-//					//red
-//					gl.glColor3f((float)1.0,0,0);
-//				}
+
 				
 				gl.glTranslated(tn.getX(), tn.getY(), tn.getZ());
 				if(tn.hitted){
@@ -333,6 +322,11 @@ public class TreeVisualizeListener
 				}
 				gl.glPopMatrix();
 				
+				gl.glDisable(GL2.GL_LIGHTING);
+				gl.glDisable(GL2.GL_LIGHT0);
+				gl.glEnable(GL2.GL_LIGHTING);
+				gl.glEnable(GL2.GL_LIGHT0);
+
 				//draw nodes and lines
 				if(tn.isShowSubtree()) {
 					for (TreeEdge e : visual.tree.getEdges(tn)) {
@@ -476,9 +470,9 @@ public class TreeVisualizeListener
 //		gl.glClearColor(227.0f/255, 237.0f/255, 205.0f/255, 0);
 
 		gl.glClearDepth(1.0);
-//		gl.glShadeModel(GL2.GL_SMOOTH);
-//		gl.glEnable(GL2.GL_LIGHTING);
-//		gl.glEnable(GL2.GL_LIGHT0);
+		gl.glShadeModel(GL2.GL_SMOOTH);
+		gl.glEnable(GL2.GL_LIGHTING);
+		gl.glEnable(GL2.GL_LIGHT0);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glEnable(GL2GL3.GL_POLYGON_SMOOTH);
 		gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
@@ -498,6 +492,16 @@ public class TreeVisualizeListener
 		}
 		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 		gl.glLoadIdentity();
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, whiteLight, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, whiteLight, 0);
+		
+		FloatBuffer fba = FloatBuffer.allocate(4);
+		fba.put(0, 0.7f);
+		fba.put(1, 0.7f);
+		fba.put(2, 0.7f);
+		fba.put(3, 1.0f);
+		gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, fba);
 
 		gld.swapBuffers();
 

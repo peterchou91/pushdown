@@ -1,5 +1,5 @@
 ->s(#)
-s(x)->s(a,x)
 s(a,x)->p(x)
-p(a,x)->p(x)
+s(x)->s(a,x)
 p(x)->s(a,x)
+p(a,x)->p(x)

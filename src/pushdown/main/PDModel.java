@@ -2,7 +2,6 @@ package pushdown.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,8 +98,7 @@ public class PDModel {
 		
 		HashMap<String, ProveNode> oriCon2PnHm = new HashMap<String,ProveNode>();
 
-		PDModel.oriProofViewer.show(Constants.ori);		
-		oriPn = findProvePath(c,rulesToStateRuleMap(rules),oriCon2PnHm,Constants.ori);
+
 //		System.exit(0);
 //		Logger.debug(configurations.size()+"");
 		for(Rule rule : rules){
@@ -171,9 +169,14 @@ public class PDModel {
 	    	rule2PnModel.put(r, pn);
 	    }
 		
+	    //原始下推系统，寻找证明树
+		PDModel.oriProofViewer.show(Constants.ori);		
+		oriPn = findProvePath(c,rulesToStateRuleMap(rules),oriCon2PnHm,Constants.ori);
+	    
+		//改良的下推系统，寻找证明树
 		HashMap<String, ProveNode> con2PnHm = new HashMap<String,ProveNode>();
-//		PDModel.proofViewer.show(Constants.pd);
-//		pn = findProvePath(c,constateRuleMap, con2PnHm,Constants.pd);
+		PDModel.proofViewer.show(Constants.pd);
+		pn = findProvePath(c,constateRuleMap, con2PnHm,Constants.pd);
 		
 		
 		//find cut nodes
@@ -797,16 +800,17 @@ public class PDModel {
 		
 		int con = 0;
 		while(!stack.empty()){
-			if(TreeVisualizer.stop){
-				return null;
-			}
-			if(con == 100){
-				return null;
-//				try{
-//					Thread.sleep(3000);
-//				}catch(Exception e){
-//					e.printStackTrace();
-//				}
+//			if(TreeVisualizer.stop){
+//				return null;
+//			}
+			if(con < 8){
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
 			con++;
 			proved = false;

@@ -1,9 +1,6 @@
 package sctl.paint.treeViewer;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,8 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JFrame;
-import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
@@ -38,11 +35,10 @@ import sctl.paint.listener.TreeGenerationListener;
 public class TreeVisualizer implements TreeGenerationListener {
 	private JFrame mainFrame;
 	protected GLJPanel showPanel;
-	protected GLJPanel subShowPanel;
+	protected JPanel subShowPanel;
 	protected JPopupMenu backPop;
 	protected JPopupMenu nodePop;
 	public TreeVisualizeListener listener;
-	public SubTreeVisualizeListener subListener;
 	public Tree tree;
 	protected TreeNode root;
 	protected TreeControlPanel tcp;
@@ -64,7 +60,7 @@ public class TreeVisualizer implements TreeGenerationListener {
 		GLCapabilities glcaps = new GLCapabilities(glp);
 		showPanel = new GLJPanel(glcaps);
 		System.out.println("init showPanel");
-		subShowPanel = new GLJPanel(glcaps);
+		subShowPanel = new JPanel();
 		iniBackPop();
 		iniNodePop();
 		tree = new Tree();
@@ -80,25 +76,20 @@ public class TreeVisualizer implements TreeGenerationListener {
 		mainFrame.getContentPane().add(showPanel);
 		mainFrame.getContentPane().add(subShowPanel);
 		showPanel.setBounds(new Rectangle(0,0,1000,700));
-		subShowPanel.setBounds(new Rectangle(700,700,400,300));
+		subShowPanel.setBounds(new Rectangle(0,700,1000,300));
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				listener = new TreeVisualizeListener(TreeVisualizer.this);
-				subListener = new SubTreeVisualizeListener(TreeVisualizer.this);
 				showPanel.addGLEventListener(listener);
 				showPanel.addMouseListener(listener);
 				showPanel.addKeyListener(listener);
 				showPanel.addMouseMotionListener(listener);
 				showPanel.addMouseWheelListener(listener);
 				
-				subShowPanel.addGLEventListener(subListener);
-				subShowPanel.addMouseListener(subListener);
-				subShowPanel.addKeyListener(subListener);
-				subShowPanel.addMouseMotionListener(subListener);
-				subShowPanel.addMouseWheelListener(subListener);
+
 			}
 			
 		});
@@ -320,7 +311,7 @@ public class TreeVisualizer implements TreeGenerationListener {
 						if(n.getLabel().trim().equals(PDModel.targetConfiguration)){
 							blackNodes.add(n);
 						}
-//						n.clearColor();
+						n.clearColor();
 						for(TreeNode tn : tree.getChildrenNodes(n)) {
 							looked.addLast(tn);
 						}
@@ -328,6 +319,7 @@ public class TreeVisualizer implements TreeGenerationListener {
 					
 					tree.setDepthColor(redNodes, new RGBColor(163,3,36), new RGBColor(253,132,149));
 					tree.setDepthColor(blackNodes, new RGBColor(0,0,0),new RGBColor(182,178,192));
+//					tree.setDepthColor();
 					System.out.println(redNodes.size());
 					System.out.println(blackNodes.size());
 					
@@ -339,10 +331,10 @@ public class TreeVisualizer implements TreeGenerationListener {
 				}else if(treeStructCopy != null){
 					tree.updateLayout(1,way,treeStructCopy);
 				}
-				if(System.currentTimeMillis() - currentTime > 1000){
-					stop = true;
-					break;
-				}
+//				if(System.currentTimeMillis() - currentTime > 1000){
+//					stop = true;
+//					break;
+//				}
 			}
 		}
 		private void copyTreeStruct(HashMap<TreeNode, ArrayList<TreeEdge>> treeStruct2) {

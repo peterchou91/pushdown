@@ -185,9 +185,9 @@ public class Tree{
 	}
 	
 	public TreeNode getNodeById(String id) {
-//		System.out.println(treeStruct.hashCode() + " treeStruct key size:" + treeStruct.keySet().size() + " search:" + id);
+
 		for(TreeNode tn : treeStruct.keySet()) {
-//			System.out.println("tree:" + tn.getId());
+
 			if(tn.getId().equals(id)) {
 				return tn;
 			}
@@ -206,17 +206,12 @@ public class Tree{
 
 		fn = getNodeById(fromId);
 		tn = getNodeById(toId);
-//		System.out.println(fn == null);
-//		System.out.println(fn.getId());
-//		System.out.println(tn == null);
-//		System.out.println(tn.getId());
-//		addEdge(new TreeEdge(fn, tn));
+
 		tn.setDepth(fn.getDepth()+1);
-//		System.out.println("fn:" + fn.getId() + "  tn:" + tn.getId());
+
 		treeStruct.get(fn).add(new TreeEdge(fn, tn));
 		this.setHeight();
-//		this.setDepthColor();
-//		System.out.println("TreeEdge added: "+fn.getId()+"--"+tn.getId());
+
 	}
 
 	public void deleteNode(TreeNode n) {
@@ -371,9 +366,13 @@ public class Tree{
 		float dr = toColor.getRed() - fromColor.getRed();
 		float dg = toColor.getGreen() - fromColor.getGreen();
 		float db = toColor.getBlue() - fromColor.getBlue();
-		
+		System.out.println("fromColor:" + fromColor);
+		System.out.println("toColor:" + toColor);
 		for(TreeNode tn : this.treeStruct.keySet()) {
 			tn.setOriColor(new RGBColor(fromColor.getRed()+dr*tn.getDepth()/height, fromColor.getGreen()+dg*tn.getDepth()/height, fromColor.getBlue()+db*tn.getDepth()/height));
+			System.out.println("tn.getHeight():" + tn.getDepth() + " height:" + height);
+			System.out.println(tn.hashCode() + " oriColor:" + tn.getOriColor());
+			tn.clearColor();
 		}
 		
 		root.setOriColor(TreeVisualizeListener.rootColor);
